@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wigsands &amp; Associates</title>
+  <style>
+    :root {
+      --primary: #18243b;
+      --accent: #c9a227;
+      --bg: #f5f6f8;
+      --card: #fff;
+      --text: #182033;
+      --muted: #778095;
+      --line: #e6e8ee;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, Segoe UI, Arial, sans-serif; background: var(--bg); color: var(--text); }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    .hidden { display: none !important; }
+
+    /* Login Screen */
+    .login-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: radial-gradient(circle at top right, #33476f 0, #111a2b 42%, #090e18 100%);
+    }
+    .login-card {
+      width: min(440px, 100%);
+      background: #fff;
+      border-radius: 24px;
+      padding: 38px;
+      box-shadow: 0 30px 80px #0007;
+      text-align: center;
+    }
+    .brand-mark {
+      width: 62px;
+      height: 62px;
+      border-radius: 18px;
+      background: var(--primary);
+      color: var(--accent);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      margin: 0 auto 18px;
+      font-size: 20px;
+    }
+    .login-card h1 { margin: 0 0 6px; }
+    .login-card p { color: var(--muted); margin: 0 0 25px; }
+    .login-tabs { display: grid; grid-template-columns: 1fr 1fr; background: #f0f2f6; padding: 4px; border-radius: 12px; margin-bottom: 20px; }
+    .tab { border: 0; background: transparent; padding: 10px; border-radius: 9px; }
+    .tab.active { background: #fff; box-shadow: 0 2px 8px #0001; font-weight: 700; }
+    .login-card label, .form-card label { display: block; text-align: left; font-weight: 650; font-size: 13px; margin: 14px 0; color: #485166; }
+    .login-card input, .form-card input, .form-card textarea, .form-card select { width: 100%; margin-top: 7px; padding: 12px 13px; border: 1px solid var(--line); border-radius: 10px; outline: none; background: #fff; }
+    .login-card input:focus, .form-card input:focus, .form-card textarea:focus { border-color: var(--accent); }
+    .login-card small { display: block; color: var(--muted); margin-top: 18px; line-height: 1.7; }
+
+    /* App Layout */
+    .app { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 260px;
+      background: var(--primary);
+      color: #fff;
+      padding: 22px 16px;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 20;
+    }
+    .side-brand { display: flex; gap: 11px; align-items: center; padding: 6px 10px 25px; }
+    .side-brand strong { display: block; font-size: 14px; }
+    .side-brand span { display: block; color: #aeb7ca; font-size: 11px; margin-top: 3px; }
+    .brand-mark.small { width: 42px; height: 42px; margin: 0; border-radius: 12px; font-size: 14px; }
+    .sidebar nav { display: grid; gap: 5px; }
+    .nav-item {
+      border: 0;
+      background: transparent;
+      color: #cbd2df;
+      text-align: left;
+      padding: 12px 13px;
+      border-radius: 10px;
+      font-weight: 600;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .nav-item:hover, .nav-item.active { background: #ffffff16; color: #fff; }
+    .nav-item.active { box-shadow: inset 3px 0 var(--accent); }
+    .side-bottom { margin-top: auto; }
+    .contact-mini { padding: 14px; background: #ffffff0c; border-radius: 12px; margin-bottom: 10px; }
+    .contact-mini span { display: block; color: #aeb7ca; font-size: 11px; }
+    .contact-mini strong { display: block; margin-top: 4px; }
+    .logout { width: 100%; border: 1px solid #ffffff18; background: transparent; color: #cbd2df; padding: 11px; border-radius: 10px; }
+    .main { margin-left: 260px; width: calc(100% - 260px); padding: 0 34px 40px; }
+    .topbar { height: 96px; display: flex; justify-content: space-between; align-items: center; }
+    .topbar h2 { margin: 3px 0 0; font-size: 25px; }
+    .eyebrow { font-size: 10px; letter-spacing: 2px; color: #8992a5; font-weight: 800; }
+    .top-actions { display: flex; gap: 12px; align-items: center; }
+    .badge { font-size: 10px; font-weight: 800; background: #e9edf5; padding: 8px 10px; border-radius: 20px; }
+    .avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 800; }
+    .icon-btn { display: none; }
+
+    /* Page Components */
+    .page { display: none; }
+    .active-page { display: block; }
+    .hero {
+      background: linear-gradient(120deg, var(--primary), #2c3b5d);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .hero h1 { font-size: 32px; margin: 8px 0; }
+    .hero p { margin: 0; color: #cbd2df; }
+    .eyebrow.light { color: #c9a227; }
+    .hero-icon { font-size: 90px; color: #ffffff16; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 18px 0; }
+    .stat { background: var(--card); padding: 20px; border-radius: var(--radius); border: 1px solid var(--line); }
+    .stat span { color: var(--muted); font-size: 12px; }
+    .stat strong { display: block; font-size: 28px; margin-top: 8px; }
+    .grid-two { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+    .card-head, .section-head { display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+    .card h3 { margin: 0 0 14px; }
+    .section-head { margin-bottom: 20px; }
+    .section-head h1 { margin: 5px 0; font-size: 30px; }
+    .section-head p { margin: 4px 0; color: var(--muted); }
+    .primary, .secondary { border: 0; padding: 11px 16px; border-radius: 10px; font-weight: 750; }
+    .primary { background: var(--primary); color: #fff; }
+    .primary:hover { filter: brightness(1.12); }
+    .secondary { background: #edf0f5; color: var(--text); }
+    .full { width: 100%; }
+    .link-btn { border: 0; background: none; color: #8a6b00; font-weight: 700; }
+    .list-row { padding: 10px 0; border-bottom: 1px solid var(--line); }
+    .list-row:last-child { border-bottom: 0; }
+    .list-row b { display: block; }
+    .list-row span { font-size: 12px; color: var(--muted); }
+    .table-wrap { overflow: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 14px 10px; border-bottom: 1px solid var(--line); font-size: 13px; white-space: nowrap; }
+    th { font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
+    .pill { display: inline-block; padding: 5px 9px; border-radius: 20px; background: #edf5ef; color: #28733b; font-size: 11px; font-weight: 750; }
+    .pill.pending { background: #fff6df; color: #8a6500; }
+    .appointment-grid, .document-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    .appointment, .document { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; display: flex; gap: 15px; align-items: center; }
+    .date-box { width: 54px; height: 54px; border-radius: 12px; background: #f1f3f7; display: grid; place-items: center; font-weight: 800; }
+    .appointment h3, .document h3 { margin: 0 0 5px; font-size: 15px; }
+    .appointment p, .document p { margin: 0; color: var(--muted); font-size: 12px; }
+    .doc-icon { font-size: 25px; }
+    .custom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .form-card h3 { margin-top: 0; }
+    .contact-hero { display: flex; align-items: center; gap: 20px; padding: 30px; }
+    .scale { width: 70px; height: 70px; border-radius: 20px; background: #f2f4f7; display: grid; place-items: center; font-size: 34px; color: var(--accent); }
+    .contact-hero h1 { margin: 5px 0; }
+    .contact-hero p { color: var(--muted); }
+    .contact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 18px; }
+    .contact-card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; text-decoration: none; color: var(--text); display: block; }
+    .contact-card span { font-size: 28px; color: var(--accent); }
+    .contact-card small { display: block; color: var(--muted); font-size: 10px; letter-spacing: 1.5px; margin-top: 18px; }
+    .contact-card strong { display: block; margin-top: 5px; }
+
+    /* Modals & Toasts */
+    .modal { position: fixed; inset: 0; background: #0008; display: grid; place-items: center; z-index: 100; padding: 20px; }
+    .modal-box { background: #fff; border-radius: 18px; width: min(520px, 100%); padding: 26px; position: relative; max-height: 90vh; overflow: auto; }
+    .modal-box h2 { margin-top: 0; }
+    .modal-close { position: absolute; right: 16px; top: 12px; border: 0; background: none; font-size: 28px; color: #777; }
+    .toast { position: fixed; right: 25px; bottom: 25px; background: var(--primary); color: #fff; padding: 13px 18px; border-radius: 10px; opacity: 0; transform: translateY(10px); transition: .25s; z-index: 200; }
+    .toast.show { opacity: 1; transform: none; }
+
+    /* Theme Variations */
+    body.square { --radius: 4px; }
+    .sidebar.light { background: #fff; color: var(--text); border-right: 1px solid var(--line); }
+    .sidebar.light .nav-item { color: #596277; }
+    .sidebar.light .nav-item:hover, .sidebar.light .nav-item.active { background: #f0f2f6; color: var(--text); }
+    .sidebar.light .side-brand span, .sidebar.light .contact-mini span { color: #8992a5; }
+    .sidebar.light .contact-mini { background: #f4f5f7; }
+    .sidebar.light .logout { color: #596277; border-color: var(--line); }
+
+    /* Responsive */
+    @media(max-width:900px) {
+      .sidebar { transform: translateX(-100%); transition: .25s; }
+      .sidebar.open { transform: none; }
+      .main { margin-left: 0; width: 100%; padding: 0 18px 30px; }
+      .icon-btn { display: inline-block; border: 0; background: none; font-size: 22px; margin-right: 8px; }
+      .topbar { height: 80px; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .grid-two, .custom-grid, .appointment-grid, .document-grid, .contact-grid { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 25px; }
+    }
+    @media(max-width:520px) {
+      .stats { grid-template-columns: 1fr 1fr; }
+      .stat { padding: 15px; }
+      .stat strong { font-size: 22px; }
+      .hero { padding: 24px; }
+      .hero-icon { font-size: 55px; }
+      .topbar h2 { font-size: 20px; }
+    }
+  </style>
+ </head>
+ <body>
+  <!-- Login Screen -->
+  <div id="loginScreen" class="login-screen">
+   <div class="login-card">
+    <div class="brand-mark">W&amp;A</div>
+    <h1 id="loginFirmName">Wigsands &amp; Associates</h1>
+    <p>Legal Practice Management Portal</p><p style="font-size:12px;color:#778095;margin-top:-15px;">Firm owners can manage client accounts and documents from the portal.</p>
+    <div class="login-tabs">
+     <button class="tab active" data-role="owner">Firm Owner</button>
+     <button class="tab" data-role="client">Client Portal</button>
+    </div>
+    <form id="loginForm">
+     <label>Username <input type="text" id="loginUser" placeholder="e.g. owner or client" required> </label> <label>Password <input type="password" id="loginPass" placeholder="••••••••" required> </label>
+     <button type="submit" class="primary full" style="margin-top: 15px;">Sign In</button>
+    </form>
+   </div>
+  </div>
+  <!-- App Interface -->
+  <div id="app" class="app hidden">
+   <!-- Sidebar -->
+   <aside class="sidebar">
+    <div class="side-brand">
+     <div class="brand-mark small">W&amp;A</div>
+     <div>
+      <strong id="sideFirmName">Wigsands &amp; Associates</strong> <span>Legal Management</span>
+     </div>
+    </div>
+    <nav>
+     <button class="nav-item active" data-page="dashboard">Dashboard</button>
+     <button class="nav-item owner-only" data-page="clients">Clients</button>
+     <button class="nav-item" data-page="cases">Cases</button>
+     <button class="nav-item" data-page="appointments">Appointments</button>
+     <button class="nav-item" data-page="documents">Documents</button>
+     <button class="nav-item owner-only" data-page="payments">Billing</button>
+     <button class="nav-item owner-only" data-page="settings">Settings</button>
+     <button class="nav-item" data-page="contact">Contact Support</button>
+    </nav>
+    <div class="side-bottom">
+     <div class="contact-mini">
+      <span>Direct Phone</span> <strong id="sidePhone">0802608717</strong>
+     </div>
+     <button class="logout" id="logoutBtn">Sign Out</button>
+    </div>
+   </aside>
+   <!-- Main Content Area -->
+   <main class="main">
+    <header class="topbar">
+     <div style="display: flex; align-items: center;">
+      <button class="icon-btn" id="mobileMenu">☰</button>
+      <div>
+       <span class="eyebrow">PORTAL OVERVIEW</span>
+       <h2 id="pageTitle">Dashboard</h2>
+      </div>
+     </div>
+     <div class="top-actions">
+      <span class="badge" id="roleBadge">OWNER</span>
+      <div class="avatar" id="avatar">W</div>
+     </div>
+    </header>
+    <!-- Dashboard Page -->
+    <section id="dashboard" class="page active-page">
+     <div class="hero">
+      <div>
+       <span class="eyebrow light">WELCOME BACK</span>
+       <h1 id="heroTitle">Wigsands &amp; Associates</h1>
+       <p id="heroText">Professional legal support, organized in one secure place.</p>
+      </div>
+      <div class="hero-icon">⚖</div>
+     </div>
+     <div class="stats owner-only" id="stats"></div>
+     <div class="grid-two">
+      <div class="card">
+       <div class="card-head">
+        <h3>Recent Cases</h3>
+        <button class="link-btn" data-page="cases">View All</button>
+       </div>
+       <div id="recentCases"></div>
+      </div>
+      <div class="card">
+       <div class="card-head">
+        <h3>Upcoming Appointments</h3>
+        <button class="link-btn" data-page="appointments">View All</button>
+       </div>
+       <div id="upcomingAppointments"></div>
+      </div>
+     </div>
+    </section>
+    <!-- Clients Page -->
+    <section id="clients" class="page owner-only">
+     <div class="section-head">
+      <div>
+       <h1>Clients</h1>
+       <p>Manage active client accounts and legal records.</p>
+      </div>
+      <button class="primary" id="addClientBtn">+ Add Client</button>
+     </div>
+     <div class="card table-wrap">
+      <table>
+       <thead>
+        <tr>
+         <th>Name</th>
+         <th>Email</th>
+         <th>Phone</th>
+         <th>Active Case</th>
+         <th>Status</th>
+         <th>Action</th>
+        </tr>
+       </thead>
+       <tbody id="clientsTable"></tbody>
+      </table>
+     </div>
+    </section>
+    <!-- Cases Page -->
+    <section id="cases" class="page">
+     <div class="section-head">
+      <div>
+       <h1>Legal Cases</h1>
+       <p>Track progress, hearing dates, and court details.</p>
+      </div>
+      <button class="primary owner-only" id="addCaseBtn">+ New Case</button>
+     </div>
+     <div class="card table-wrap">
+      <table>
+       <thead>
+        <tr>
+         <th>Case Name</th>
+         <th>Client</th>
+         <th>Type</th>
+         <th>Next Date</th>
+         <th>Status</th>
+        </tr>
+       </thead>
+       <tbody id="casesTable"></tbody>
+      </table>
+     </div>
+    </section>
+    <!-- Appointments Page -->
+    <section id="appointments" class="page">
+     <div class="section-head">
+      <div>
+       <h1>Appointments</h1>
+       <p>Scheduled consultations and court sessions.</p>
+      </div>
+      <button class="primary owner-only" id="addAppointmentBtn">+ Schedule</button>
+     </div>
+     <div class="appointment-grid" id="appointmentsList"></div>
+    </section>
+    <!-- Documents Page -->
+    <section id="documents" class="page">
+     <div class="section-head">
+      <div>
+       <h1>Documents</h1>
+       <p>Files, legal briefs, and client upload portal.</p>
+      </div>
+      <button class="primary owner-only" id="addDocumentBtn">+ Upload Document</button>
+     </div>
+     <div class="document-grid" id="documentsList"></div>
+    </section>
+    <!-- Payments Page -->
+    <section id="payments" class="page owner-only">
+     <div class="section-head">
+      <div>
+       <h1>Billing &amp; Invoices</h1>
+       <p>Track retainers, consultation fees, and payments.</p>
+      </div>
+      <button class="primary" id="addPaymentBtn">+ Record Payment</button>
+     </div>
+     <div class="card table-wrap">
+      <table>
+       <thead>
+        <tr>
+         <th>Client</th>
+         <th>Description</th>
+         <th>Amount</th>
+         <th>Date</th>
+         <th>Status</th>
+        </tr>
+       </thead>
+       <tbody id="paymentsTable"></tbody>
+      </table>
+     </div>
+    </section>
+    <!-- Settings Page -->
+    <section id="settings" class="page owner-only">
+     <div class="section-head">
+      <div>
+       <h1>System Settings</h1>
+       <p>Customize practice details and app branding.</p>
+      </div>
+     </div>
+     <div class="custom-grid">
+      <div class="card form-card">
+       <h3>Firm Information</h3>
+       <form id="settingsForm">
+        <label>Firm Name <input id="firmNameInput" type="text"></label> <label>Phone Number <input id="phoneInput" type="text"></label> <label>Email Address <input id="emailInput" type="email"></label> <label>WhatsApp Number <input id="whatsappInput" type="text"></label> <label>Office Address <input id="addressInput" type="text"></label> <label>Hero Title <input id="heroTitleInput" type="text"></label> <label>Hero Description <textarea id="heroTextInput" rows="2"></textarea></label>
+        <button type="submit" class="primary full" style="margin-top:10px;">Save Business Profile</button>
+       </form>
+      </div>
+      <div class="card form-card">
+       <h3>Visual Style &amp; Theme</h3>
+       <form id="designForm">
+        <label>Primary Brand Color <input id="primaryColorInput" type="color"></label> <label>Accent Color <input id="accentColorInput" type="color"></label> <label>Background Color <input id="bgColorInput" type="color"></label> <label>Sidebar Style <select id="sidebarModeInput"> <option value="dark">Dark</option> <option value="light">Light</option> </select> </label> <label>Border Radius <select id="radiusInput"> <option value="rounded">Rounded Corners</option> <option value="square">Sharp Edges</option> </select> </label>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+         <button type="submit" class="primary full">Apply Design</button>
+         <button type="button" id="resetDesign" class="secondary">Reset</button>
+        </div>
+       </form>
+      </div>
+     </div>
+    </section>
+    <!-- Contact Page -->
+    <section id="contact" class="page">
+     <div class="card contact-hero">
+      <div class="scale">⚖</div>
+      <div>
+       <h1 id="contactFirm">Wigsands &amp; Associates</h1>
+       <p id="contactAddress">Your legal team is ready to assist.</p>
+      </div>
+     </div>
+     <div class="contact-grid">
+      <a id="phoneLink" href="#" class="contact-card"> <span>📞</span> <small>CALL US</small> <strong id="contactPhone">0802608717</strong> </a> <a id="emailLink" href="#" class="contact-card"> <span>✉</span> <small>EMAIL SUPPORT</small> <strong id="contactEmail">Add your email</strong> </a> <a id="whatsappLink" href="#" class="contact-card"> <span>💬</span> <small>WHATSAPP</small> <strong id="contactWhatsApp">Add WhatsApp</strong> </a>
+     </div>
+    </section>
+   </main>
+  </div>
+  <!-- Dynamic Form Modal -->
+  <div id="modal" class="modal hidden">
+   <div class="modal-box">
+    <button class="modal-close" id="closeModal">×</button>
+    <h2 id="modalTitle">Form Header</h2>
+    <form id="modalForm"></form>
+   </div>
+  </div>
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">Notification Message</div>
+  <script>
+    const DEFAULT = {
+      firmName: "Wigsands & Associates", phone: "0802608717", email: "", address: "", whatsapp: "",
+      heroTitle: "Wigsands & Associates", heroText: "Professional legal support, organized in one secure place.",
+      primary: "#18243b", accent: "#c9a227", bg: "#f5f6f8", sidebar: "dark", radius: "rounded"
+    };
+
+    const state = {
+      settings: JSON.parse(localStorage.getItem("wa_settings") || "null") || DEFAULT,
+      clients: JSON.parse(localStorage.getItem("wa_clients") || "null") || [
+        { id: 1, name: "Mr Adewale", username: "adewale", password: "ade123", email: "adewale@example.com", phone: "0800000000", case: "Property Matter", status: "Active" },
+        { id: 2, name: "Mrs Amaka", username: "amaka", password: "ama123", email: "amaka@example.com", phone: "0800000001", case: "Civil Matter", status: "Active" },
+        { id: 3, name: "Mr Chinedu", username: "chinedu", password: "chi123", email: "chinedu@example.com", phone: "0800000002", case: "Family Matter", status: "Active" }
+      ],
+      cases: JSON.parse(localStorage.getItem("wa_cases") || "null") || [
+        { id: 1, name: "Property Matter", client: "Demo Client", type: "Civil", date: "2026-09-02", status: "Active" }
+      ],
+      appointments: JSON.parse(localStorage.getItem("wa_appointments") || "null") || [
+        { id: 1, client: "Demo Client", title: "Initial Consultation", date: "2026-08-28", time: "10:00 AM", status: "Confirmed" }
+      ],
+      documents: JSON.parse(localStorage.getItem("wa_documents") || "null") || [
+        { id: 1, name: "Client Intake Form", client: "Demo Client", type: "PDF", date: "2026-08-21" }
+      ],
+      payments: JSON.parse(localStorage.getItem("wa_payments") || "null") || [
+        { id: 1, client: "Demo Client", description: "Consultation", amount: "₦50,000", date: "2026-08-21", status: "Paid" }
+      ],
+      role: "owner",
+      currentClient: null
+    };
+
+    function save(k) { localStorage.setItem("wa_" + k, JSON.stringify(state[k])); }
+    function saveSettings() { localStorage.setItem("wa_settings", JSON.stringify(state.settings)); }
+
+    const $ = s => document.querySelector(s);
+    const $$ = s => [...document.querySelectorAll(s)];
+
+    function toast(msg) {
+      const t = $("#toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2200);
+    }
+
+    function applySettings() {
+      const s = state.settings;
+      document.documentElement.style.setProperty("--primary", s.primary);
+      document.documentElement.style.setProperty("--accent", s.accent);
+      document.documentElement.style.setProperty("--bg", s.bg);
+      document.body.classList.toggle("square", s.radius === "square");
+
+      $("#sideFirmName").textContent = s.firmName;
+      $("#loginFirmName").textContent = s.firmName;
+      $("#heroTitle").textContent = s.heroTitle || s.firmName;
+      $("#heroText").textContent = s.heroText;
+      $("#sidePhone").textContent = s.phone;
+      $("#contactFirm").textContent = s.firmName;
+      $("#contactPhone").textContent = s.phone;
+      $("#contactEmail").textContent = s.email || "Add your email";
+      $("#contactWhatsApp").textContent = s.whatsapp || "Add WhatsApp";
+      $("#contactAddress").textContent = s.address || "Your legal team is ready to assist.";
+
+      $("#phoneLink").href = "tel:" + s.phone.replace(/\s/g, "");
+      $("#emailLink").href = s.email ? "mailto:" + s.email : "#";
+      $("#whatsappLink").href = s.whatsapp ? "https://wa.me/" + s.whatsapp.replace(/\D/g, "") : "#";
+
+      $("#firmNameInput").value = s.firmName;
+      $("#phoneInput").value = s.phone;
+      $("#emailInput").value = s.email;
+      $("#addressInput").value = s.address;
+      $("#whatsappInput").value = s.whatsapp;
+      $("#heroTitleInput").value = s.heroTitle;
+      $("#heroTextInput").value = s.heroText;
+
+      $("#primaryColorInput").value = s.primary;
+      $("#accentColorInput").value = s.accent;
+      $("#bgColorInput").value = s.bg;
+      $("#sidebarModeInput").value = s.sidebar;
+      $("#radiusInput").value = s.radius;
+
+      $(".sidebar").classList.toggle("light", s.sidebar === "light");
+    }
+
+    function render() {
+      applySettings();
+      const owner = state.role === "owner";
+      const clientName = state.currentClient ? state.currentClient.name : "";
+      const visibleCases = owner ? state.cases : state.cases.filter(x => x.client === clientName);
+      const visibleAppointments = owner ? state.appointments : state.appointments.filter(x => x.client === clientName);
+      const visibleDocuments = owner ? state.documents : state.documents.filter(x => x.client === clientName);
+      const visiblePayments = owner ? state.payments : state.payments.filter(x => x.client === clientName);
+
+      $$(".owner-only").forEach(x => x.style.display = owner ? "" : "none");
+      $("#roleBadge").textContent = owner ? "OWNER" : "CLIENT";
+      $("#avatar").textContent = owner ? "W" : (clientName.charAt(0) || "C");
+      $("#heroTitle").textContent = owner ? (state.settings.heroTitle || state.settings.firmName) : "Welcome, " + clientName;
+      $("#heroText").textContent = owner ? state.settings.heroText : "Your private legal case information and documents.";
+
+      $("#stats").innerHTML = `
+        <div class="stat"><span>Active Cases</span><strong>${visibleCases.filter(x => x.status === "Active").length}</strong></div>
+        <div class="stat"><span>Clients</span><strong>${owner ? state.clients.length : 1}</strong></div>
+        <div class="stat"><span>Appointments</span><strong>${visibleAppointments.length}</strong></div>
+        <div class="stat"><span>Documents</span><strong>${visibleDocuments.length}</strong></div>
+      `;
+
+      $("#recentCases").innerHTML = visibleCases.slice(0, 4).map(x => `
+        <div class="list-row"><b>${x.name}</b><span>${x.client} · <em>${x.status}</em></span></div>
+      `).join("") || "<p>No cases yet.</p>";
+
+      $("#upcomingAppointments").innerHTML = visibleAppointments.slice(0, 4).map(x => `
+        <div class="list-row"><b>${x.title}</b><span>${x.date} · ${x.time}</span></div>
+      `).join("") || "<p>No appointments yet.</p>";
+
+      $("#clientsTable").innerHTML = state.clients.map(x => `
+        <tr>
+          <td><b>${x.name}</b></td><td>${x.email}</td><td>${x.phone}</td><td><b>${x.username || ""}</b></td><td>${x.password || ""}</td><td>${x.case}</td>
+          <td><span class="pill">${x.status}</span></td>
+          <td><button class="link-btn" onclick="editClient(${x.id})">Edit</button> <button class="link-btn" onclick="deleteItem('clients',${x.id})">Delete</button></td>
+        </tr>
+      `).join("");
+
+      $("#casesTable").innerHTML = visibleCases.map(x => `
+        <tr><td><b>${x.name}</b></td><td>${x.client}</td><td>${x.type}</td><td>${x.date}</td>
+        <td><span class="pill ${x.status !== "Active" ? "pending" : ""}">${x.status}</span></td></tr>
+      `).join("");
+
+      $("#appointmentsList").innerHTML = visibleAppointments.map(x => `
+        <div class="appointment"><div class="date-box">${x.date.slice(-2)}</div>
+        <div><h3>${x.title}</h3><p>${x.client} · ${x.date} · ${x.time}</p></div>
+        <span class="pill">${x.status}</span></div>
+      `).join("") || "<p>No appointments yet.</p>";
+
+      $("#documentsList").innerHTML = visibleDocuments.map(x => `
+        <div class="document">
+          <div class="doc-icon">▤</div>
+          <div style="flex:1">
+            <h3>${x.name}</h3>
+            <p>${x.client} · ${x.type || x.fileType || "FILE"} · ${x.date || ""}</p>
+            ${x.fileData ? `<button class="link-btn" onclick="openDocument(${x.id})">Open document</button>` : ""}
+          </div>
+        </div>
+      `).join("") || "<p>No documents yet.</p>";
+
+      $("#paymentsTable").innerHTML = visiblePayments.map(x => `
+        <tr><td>${x.client}</td><td>${x.description}</td><td><b>${x.amount}</b></td>
+        <td>${x.date}</td><td><span class="pill">${x.status}</span></td></tr>
+      `).join("");
+    }
+
+    function openModal(type) {
+      const fields = {
+        clients: [["name", "Client name", "text"], ["username", "Username", "text"], ["password", "Password", "text"], ["email", "Email", "email"], ["phone", "Phone", "text"], ["case", "Case", "text"], ["status", "Status", "text"]],
+        cases: [["name", "Case name", "text"], ["client", "Client", "text"], ["type", "Case type", "text"], ["date", "Next date", "date"], ["status", "Status", "text"]],
+        appointments: [["client", "Client", "text"], ["title", "Appointment", "text"], ["date", "Date", "date"], ["time", "Time", "text"], ["status", "Status", "text"]],
+        documents: [["name", "Document name", "text"], ["client", "Client", "text"], ["type", "File type", "text"], ["date", "Date", "date"]],
+        payments: [["client", "Client", "text"], ["description", "Description", "text"], ["amount", "Amount", "text"], ["date", "Date", "date"], ["status", "Status", "text"]]
+      };
+
+      $("#modalTitle").textContent = "Add " + type.slice(0, -1).replace(/^./, c => c.toUpperCase());
+      const extra = type === "documents"
+        ? `<label>Choose document from your device<input id="documentFile" name="file" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png" required></label>`
+        : "";
+      $("#modalForm").innerHTML = fields[type].map(f => `<label>${f[1]}<input name="${f[0]}" type="${f[2]}" required></label>`).join("") + extra + `<button class="primary full" type="submit">Save</button>`;
+      if (type === "documents") {
+        const clientField = $("#modalForm").querySelector('input[name="client"]');
+        if (state.clients.length) {
+          clientField.outerHTML = `<select name="client" required><option value="">Select client</option>${state.clients.map(c => `<option value="${c.name}">${c.name}</option>`).join("")}</select>`;
+        }
+      }
+      $("#modal").classList.remove("hidden");
+
+      $("#modalForm").onsubmit = async e => {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const o = Object.fromEntries(fd.entries());
+        o.id = Date.now();
+
+        if (type === "clients") {
+          if (state.clients.some(c => c.username === o.username)) {
+            toast("That username is already in use");
+            return;
+          }
+        }
+
+        if (type === "documents") {
+          const file = fd.get("file");
+          if (!file || !file.size) {
+            toast("Please choose a document");
+            return;
+          }
+          // Store the selected file locally in this browser so it can be
+          // reopened/downloaded from the client portal on this device.
+          const reader = new FileReader();
+          reader.onload = () => {
+            o.name = o.name || file.name;
+            o.fileName = file.name;
+            o.fileType = file.type || "application/octet-stream";
+            o.fileData = reader.result;
+            delete o.file;
+            state.documents.push(o);
+            save("documents");
+            $("#modal").classList.add("hidden");
+            render();
+            toast("Document uploaded and assigned to " + o.client);
+          };
+          reader.readAsDataURL(file);
+          return;
+        }
+
+        state[type].push(o);
+        save(type);
+        $("#modal").classList.add("hidden");
+        render();
+        toast("Saved successfully");
+      };
+    }
+
+    function editClient(id) {
+      if (state.role !== "owner") return;
+      const client = state.clients.find(c => c.id === id);
+      if (!client) return;
+
+      $("#modalTitle").textContent = "Edit Client";
+      $("#modalForm").innerHTML = `
+        <label>Client name<input name="name" value="${client.name || ""}" required></label>
+        <label>Username<input name="username" value="${client.username || ""}" required></label>
+        <label>Password<input name="password" value="${client.password || ""}" required></label>
+        <label>Email<input name="email" type="email" value="${client.email || ""}" required></label>
+        <label>Phone<input name="phone" value="${client.phone || ""}" required></label>
+        <label>Case<input name="case" value="${client.case || ""}" required></label>
+        <label>Status<input name="status" value="${client.status || "Active"}" required></label>
+        <button class="primary full" type="submit">Save Changes</button>
+      `;
+      $("#modal").classList.remove("hidden");
+
+      $("#modalForm").onsubmit = e => {
+        e.preventDefault();
+        const updated = Object.fromEntries(new FormData(e.target));
+        Object.assign(client, updated);
+        save("clients");
+        $("#modal").classList.add("hidden");
+        render();
+        toast("Client account updated");
+      };
+    }
+
+function openDocument(id) {
+      const doc = state.documents.find(x => x.id === id);
+      if (!doc || !doc.fileData) {
+        toast("This document has no stored file");
+        return;
+      }
+      const a = document.createElement("a");
+      a.href = doc.fileData;
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.download = doc.fileName || doc.name || "document";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    function deleteItem(type, id) {
+      state[type] = state[type].filter(x => x.id !== id);
+      save(type);
+      render();
+      toast("Deleted");
+    }
+
+    function go(page) {
+      $$(".page").forEach(p => p.classList.remove("active-page"));
+      $("#" + page).classList.add("active-page");
+      $$(".nav-item").forEach(n => n.classList.toggle("active", n.dataset.page === page));
+      $("#pageTitle").textContent = page[0].toUpperCase() + page.slice(1);
+      $(".sidebar").classList.remove("open");
+    }
+
+    $$(".nav-item").forEach(n => n.onclick = () => go(n.dataset.page));
+    $$(".link-btn").forEach(n => n.onclick = () => go(n.dataset.page));
+
+    $("#addClientBtn").onclick = () => openModal("clients");
+    $("#addCaseBtn").onclick = () => openModal("cases");
+    $("#addAppointmentBtn").onclick = () => openModal("appointments");
+    $("#addDocumentBtn").onclick = () => openModal("documents");
+    $("#addPaymentBtn").onclick = () => openModal("payments");
+
+    $("#closeModal").onclick = () => $("#modal").classList.add("hidden");
+    $("#mobileMenu").onclick = () => $(".sidebar").classList.toggle("open");
+
+    $$(".tab").forEach(t => t.onclick = () => {
+      $$(".tab").forEach(x => x.classList.remove("active"));
+      t.classList.add("active");
+      state.loginRole = t.dataset.role;
+    });
+
+    $("#loginForm").onsubmit = e => {
+      e.preventDefault();
+      const u = $("#loginUser").value.trim();
+      const p = $("#loginPass").value;
+      const role = state.loginRole || "owner";
+
+      if (role === "owner" && u === "owner" && p === "admin123") {
+        state.role = "owner";
+        state.currentClient = null;
+        $("#loginScreen").classList.add("hidden");
+        $("#app").classList.remove("hidden");
+        go("dashboard");
+        render();
+      } else if (role === "client") {
+        const client = state.clients.find(c => c.username === u && c.password === p);
+        if (client) {
+          state.role = "client";
+          state.currentClient = client;
+          $("#loginScreen").classList.add("hidden");
+          $("#app").classList.remove("hidden");
+          go("dashboard");
+          render();
+        } else {
+          toast("Incorrect client username or password");
+        }
+      } else {
+        toast("Incorrect owner login details");
+      }
+    };
+
+    $("#logoutBtn").onclick = () => {
+      $("#app").classList.add("hidden");
+      $("#loginScreen").classList.remove("hidden");
+      state.role = "owner";
+      state.currentClient = null;
+      $("#loginForm").reset();
+    };
+
+    $("#settingsForm").onsubmit = e => {
+      e.preventDefault();
+      state.settings = {
+        ...state.settings,
+        firmName: $("#firmNameInput").value,
+        phone: $("#phoneInput").value,
+        email: $("#emailInput").value,
+        address: $("#addressInput").value,
+        whatsapp: $("#whatsappInput").value,
+        heroTitle: $("#heroTitleInput").value,
+        heroText: $("#heroTextInput").value
+      };
+      saveSettings();
+      render();
+      toast("Business details updated");
+    };
+
+    $("#designForm").onsubmit = e => {
+      e.preventDefault();
+      state.settings = {
+        ...state.settings,
+        primary: $("#primaryColorInput").value,
+        accent: $("#accentColorInput").value,
+        bg: $("#bgColorInput").value,
+        sidebar: $("#sidebarModeInput").value,
+        radius: $("#radiusInput").value
+      };
+      saveSettings();
+      render();
+      toast("Design updated");
+    };
+
+    $("#resetDesign").onclick = () => {
+      state.settings = { ...state.settings, ...DEFAULT };
+      saveSettings();
+      render();
+      toast("Design reset");
+    };
+
+    state.loginRole = "owner";
+    applySettings();
+  </script>
+ </body>
+</html>
